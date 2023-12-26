@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Car IVIS System</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      background-color: #2c3e50;
+    }
+
+    #ivisSystem {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background-color: #34495e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px;
+    }
+
+    .screen {
+      width: 100%;
+      height: 70%;
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: #2c3e50;
+      color: #ecf0f1;
+      text-align: center;
+      padding: 20px;
+      overflow-y: scroll;
+      border-radius: 10px;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 60px;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+    }
+
+    .button {
+      width: 120px;
+      height: 60px;
+      background-color: #3498db;
+      color: #ecf0f1;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    select, input {
+      width: 150px;
+      height: 30px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 5px;
+      padding: 5px;
+      font-size: 14px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      padding: 10px;
+      background-color: #34495e;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    li:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div id="ivisSystem">
+    <div class="screen" id="mapScreen">
+      <h2>Navigation Map</h2>
+      <div id="map">
+        <!-- Add a map component or use an embedded map from a service like Google Maps -->
+        <iframe width="100%" height="400" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.520712743325!2d-122.41941548538949!3d37.77492957975998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808f7e30b2b473c3%3A0xd7f89c07f9d426fd!2sGolden%20Gate%20Bridge!5e0!3m2!1sen!2sus!4v1643181697421!5m2!1sen!2sus" frameborder="0" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+      </div>
+    </div>
+    <div class="screen" id="musicPlayerScreen">
+      <h2>Music Player</h2>
+      <div id="musicPlayer">
+        <select id="playlistSelector">
+          <option value="playlist1">Playlist 1</option>
+          <option value="playlist2">Playlist 2</option>
+        </select>
+        <ul id="playlist">
+          <li>Song 1</li>
+          <li>Song 2</li>
+          <li>Song 3</li>
+        </ul>
+        <audio controls id="audioPlayer">
+          <source src="" type="audio/mp3">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+    </div>
+    <div class="screen" id="phoneScreen">
+      <h2>Phone</h2>
+      <div id="contacts">
+        <ul>
+          <li>John - 07896123661</li>
+          <li>Susie - 07763111256</li>
+          <li>Chloe - 07963554467</li>
+          <li>Fred - 07962333691</li>
+          <li>Jannat - 07559369111</li>
+          <li>Garett - 07778956487</li>
+        </ul>
+      </div>
+    </div>
+    <div class="screen" id="settingsScreen">
+      <h2>System Settings</h2>
+      <label for="brightnessRange">Brightness:</label>
+      <input type="range" id="brightnessRange" min="0" max="100" step="1" value="50">
+      <label for="volumeRange">Volume:</label>
+      <input type="range" id="volumeRange" min="0" max="100" step="1" value="70">
+    </div>
+    <!-- New screen for displaying button click information -->
+    <div class="screen" id="clickInfoScreen">
+      <h2>Button Click Information</h2>
+      <div id="clickInfo">
+        <ul id="fullClickInfoList"></ul>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="button" onclick="recordButtonClick('Map'); showScreen('mapScreen')">Map</button>
+      <button class="button" onclick="recordButtonClick('Music'); showScreen('musicPlayerScreen')">Music</button>
+      <button class="button" onclick="recordButtonClick('Phone'); showScreen('phoneScreen')">Phone</button>
+      <button class="button" onclick="recordButtonClick('Settings'); showScreen('settingsScreen')">Settings</button>
+      <button class="button" onclick="showClickInfoScreen()">Click Info</button>
+    </div>
+    <div id="buttonClickInfo">
+      <h3>Button Click Information</h3>
+      <ul id="clickInfoList"></ul>
+    </div>
+
+  <script>
+    // Object to store button click counts
+    const buttonClickCounts = {
+      Map: 0,
+      Music: 0,
+      Phone: 0,
+      Settings: 0,
+    };
+
+    function showScreen(screenId) {
+      const screens = document.querySelectorAll('.screen');
+      screens.forEach(screen => {
+        screen.style.display = 'none';
+      });
+
+      const targetScreen = document.getElementById(screenId);
+      if (targetScreen) {
+        targetScreen.style.display = 'block';
+      }
+    }
+
+    function recordButtonClick(buttonName) {
+      // Increment the click count for the specified button
+      buttonClickCounts[buttonName]++;
+
+      // Update the button click information
+      updateButtonClickInfo();
+    }
+
+    function showClickInfoScreen() {
+      showScreen('clickInfoScreen');
+      updateFullButtonClickInfo();
+    }
+
+    function updateButtonClickInfo() {
+      const clickInfoList = document.getElementById('clickInfoList');
+      clickInfoList.innerHTML = '';
+
+      for (const buttonName in buttonClickCounts) {
+        const clickCount = buttonClickCounts[buttonName];
+        const listItem = document.createElement('li');
+        listItem.textContent = `Button "${buttonName}" clicked ${clickCount} times.`;
+        clickInfoList.appendChild(listItem);
+      }
+    }
+
+    function updateFullButtonClickInfo() {
+      const fullClickInfoList = document.getElementById('fullClickInfoList');
+      fullClickInfoList.innerHTML = '';
+
+      for (const buttonName in buttonClickCounts) {
+        const clickCount = buttonClickCounts[buttonName];
+        const listItem = document.createElement('li');
+        listItem.textContent = `Button "${buttonName}" clicked ${clickCount} times.`;
+        fullClickInfoList.appendChild(listItem);
+      }
+    }
+
+    // Update audio source based on selected song
+    document.getElementById('playlist').addEventListener('click', function(e) {
+      if (e.target.tagName === 'LI') {
+        const songTitle = e.target.innerText;
+        const audioPlayer = document.getElementById('audioPlayer');
+        audioPlayer.src = `fake_music/${songTitle.replace(/\s/g, '_')}.mp3`;
+        audioPlayer.play();
+      }
+    });
+  </script>
+</body>
+</html>
